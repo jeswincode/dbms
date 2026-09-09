@@ -1,0 +1,407 @@
+/* ==========================================================================
+   F1 Management System — stylesheet
+   Palette:
+     --asphalt   #0B0D10   base background
+     --panel     #15181D   card / panel surface
+     --panel-2   #1C2027   raised surface (table rows, inputs)
+     --line      #262B33   hairline borders
+     --red       #C81E3A   primary accent (CTA, active states)
+     --amber     #F5B700   secondary accent (highlights, focus)
+     --green     #2FBF71   "active/completed" status
+     --text      #ECEEF1   primary text
+     --muted     #8B93A1   secondary text
+   Type: Titillium Web for both display and body (varied weight/spacing)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,600&display=swap');
+
+:root {
+  --asphalt: #0B0D10;
+  --panel: #15181D;
+  --panel-2: #1C2027;
+  --line: #262B33;
+  --red: #C81E3A;
+  --red-bright: #E63950;
+  --amber: #F5B700;
+  --green: #2FBF71;
+  --text: #ECEEF1;
+  --muted: #8B93A1;
+  --radius: 6px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--asphalt);
+  color: var(--text);
+  font-family: 'Titillium Web', sans-serif;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+a { color: inherit; text-decoration: none; }
+
+h1, h2, h3 {
+  font-family: 'Titillium Web', sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+/* -----------------------------------------------------------------------
+   Top navigation
+   ----------------------------------------------------------------------- */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 2rem;
+  background: rgba(11, 13, 16, 0.92);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 900;
+  font-size: 1.15rem;
+  letter-spacing: 0.02em;
+}
+
+.brand .stripe {
+  width: 10px;
+  height: 22px;
+  background: linear-gradient(180deg, var(--red) 0%, var(--red) 50%, var(--amber) 50%, var(--amber) 100%);
+  border-radius: 2px;
+  transform: skewX(-12deg);
+}
+
+.nav-links {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.nav-links a:hover { color: var(--text); }
+
+.nav-links a.active {
+  color: var(--text);
+  border-bottom-color: var(--red);
+}
+
+/* -----------------------------------------------------------------------
+   Hero (dashboard landing)
+   ----------------------------------------------------------------------- */
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 4.5rem 2rem 3rem;
+  background:
+    repeating-linear-gradient(
+      115deg,
+      rgba(200, 30, 58, 0.10) 0px,
+      rgba(200, 30, 58, 0.10) 2px,
+      transparent 2px,
+      transparent 46px
+    ),
+    radial-gradient(ellipse at 20% -10%, rgba(200, 30, 58, 0.25), transparent 55%),
+    var(--asphalt);
+  border-bottom: 1px solid var(--line);
+}
+
+.hero-eyebrow {
+  color: var(--amber);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  line-height: 1.05;
+  margin-top: 0.4rem;
+  max-width: 16ch;
+}
+
+.hero p.lead {
+  margin-top: 1rem;
+  max-width: 56ch;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+/* Checkered strip — used once, as the hero's closing accent */
+.checker-strip {
+  height: 14px;
+  margin-top: 2.5rem;
+  background-image:
+    linear-gradient(45deg, var(--text) 25%, transparent 25%, transparent 75%, var(--text) 75%),
+    linear-gradient(45deg, var(--text) 25%, transparent 25%, transparent 75%, var(--text) 75%);
+  background-size: 14px 14px;
+  background-position: 0 0, 7px 7px;
+  opacity: 0.14;
+}
+
+/* -----------------------------------------------------------------------
+   Stat cards (timing-tower style numerals)
+   ----------------------------------------------------------------------- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  padding: 2.2rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.stat-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--red);
+  border-radius: var(--radius);
+  padding: 1.2rem 1.3rem;
+}
+
+.stat-card .num {
+  font-family: 'Titillium Web', sans-serif;
+  font-weight: 900;
+  font-size: 2.4rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-card .label {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
+}
+
+.stat-card a { display: block; }
+
+/* -----------------------------------------------------------------------
+   Page container / section header
+   ----------------------------------------------------------------------- */
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.4rem 2rem 4rem;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.4rem;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.section-head h2 {
+  font-size: 1.7rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.1rem;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 0.92rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--red);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--red-bright); }
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--line);
+  color: var(--text);
+}
+.btn-ghost:hover { border-color: var(--muted); }
+
+.btn-danger {
+  background: transparent;
+  border-color: rgba(200, 30, 58, 0.4);
+  color: var(--red-bright);
+  padding: 0.4rem 0.7rem;
+  font-size: 0.82rem;
+}
+.btn-danger:hover { background: rgba(200, 30, 58, 0.12); }
+
+/* -----------------------------------------------------------------------
+   Data tables (timing-screen style)
+   ----------------------------------------------------------------------- */
+.table-wrap {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  min-width: 640px;
+}
+
+thead th {
+  text-align: left;
+  padding: 0.85rem 1rem;
+  background: var(--panel-2);
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--line);
+}
+
+tbody td {
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
+
+.mono { font-variant-numeric: tabular-nums; color: var(--muted); }
+
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 100px;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+.badge-on { background: rgba(47, 191, 113, 0.15); color: var(--green); }
+.badge-off { background: rgba(139, 147, 161, 0.15); color: var(--muted); }
+
+.row-actions { display: flex; gap: 0.5rem; }
+.row-actions form { margin: 0; }
+
+.empty-state {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: var(--muted);
+}
+.empty-state a { color: var(--amber); font-weight: 700; }
+
+/* -----------------------------------------------------------------------
+   Forms
+   ----------------------------------------------------------------------- */
+.form-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 2rem;
+  max-width: 560px;
+}
+
+.field { margin-bottom: 1.2rem; }
+
+.field label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.02em;
+}
+
+.field input[type="text"],
+.field input[type="number"],
+.field input[type="date"],
+.field select {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.field input:focus, .field select:focus {
+  outline: none;
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px rgba(245, 183, 0, 0.15);
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.checkbox-field input { width: 18px; height: 18px; accent-color: var(--red); }
+.checkbox-field label { margin: 0; }
+
+.form-actions {
+  display: flex;
+  gap: 0.7rem;
+  margin-top: 1.6rem;
+}
+
+/* -----------------------------------------------------------------------
+   Flash messages
+   ----------------------------------------------------------------------- */
+.flash-wrap {
+  max-width: 1200px;
+  margin: 1rem auto 0;
+  padding: 0 2rem;
+}
+
+.flash {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  margin-bottom: 0.6rem;
+  font-size: 0.9rem;
+  border-left: 3px solid var(--green);
+  background: rgba(47, 191, 113, 0.08);
+}
+.flash.info { border-left-color: var(--muted); background: rgba(139, 147, 161, 0.08); }
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.82rem;
+  padding: 2rem;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 640px) {
+  .navbar { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
+  .hero { padding: 3rem 1.2rem 2rem; }
+  .page { padding: 1.8rem 1.2rem 3rem; }
+}

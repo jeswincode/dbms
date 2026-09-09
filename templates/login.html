@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Login — F1 Fleet Control{% endblock %}
+
+{% block content %}
+<div class="page" style="max-width: 420px; margin-top: 3rem;">
+  <div class="form-card">
+    <h2 style="margin-bottom: 0.2rem;">System Login</h2>
+    <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Enter credentials to access paddock management.</p>
+
+    <form method="POST" action="{{ url_for('login') }}">
+      <div class="field">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Login</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

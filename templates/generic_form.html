@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if record else 'Add' }} {{ entity[:-1] | title }} — F1 Fleet Control{% endblock %}
+
+{% block content %}
+<div class="page">
+  <div class="section-head">
+    <h2>{{ 'Edit' if record else 'Add' }} {{ entity[:-1] }}</h2>
+    <a href="{{ url_for('list_records', entity=entity) }}" class="btn btn-ghost">Back to {{ entity }}</a>
+  </div>
+
+  <form class="form-card" method="POST">
+    {% for col in columns %}
+      <!-- We skip auto-incrementing primary keys -->
+      {% if not col.primary_key %}
+        
+        <!-- Get the current value if we are editing -->
+        {% set val = record|attr(col.name) if record else '' %}
+        {% set col_type = col.type.__class__.__name__ %}
+        {% set label_name = col.name | replace('_', ' ') | capitalize %}
+
+        {% if col.foreign_keys %}
+          <!-- DYNAMIC FOREIGN KEY DROPDOWNS -->
+          <div class="field">
+            <label for="{{ col.name }}">{{ label_name }}</label>
+            <select id="{{ col.name }}" name="{{ col.name }}">
+              <option value="">— Unassigned —</option>
+              {% for item in related_data[col.name] %}
+                <!-- Auto-detect what attribute to show in the dropdown based on common column names -->
+                {% set display_name = item.name or item.chassis_name or item.grand_prix_name or "ID: " ~ item.id %}
+                <option value="{{ item.id }}" {% if val == item.id %}selected{% endif %}>
+                  {{ display_name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+        {% elif col_type == 'Boolean' %}
+          <!-- DYNAMIC CHECKBOXES -->
+          <div class="field checkbox-field">
+            <input type="checkbox" id="{{ col.name }}" name="{{ col.name }}" {% if val %}checked{% endif %}>
+            <label for="{{ col.name }}">{{ label_name }}</label>
+          </div>
+
+        {% elif col_type == 'Date' %}
+          <!-- DYNAMIC DATE PICKERS -->
+          <div class="field">
+            <label for="{{ col.name }}">{{ label_name }}</label>
+            <input type="date" id="{{ col.name }}" name="{{ col.name }}" value="{{ val }}" required>
+          </div>
+
+        {% elif col_type in ['Float', 'Numeric', 'Integer'] %}
+          <!-- DYNAMIC NUMBER INPUTS -->
+          <div class="field">
+            <label for="{{ col.name }}">{{ label_name }}</label>
+            <input type="number" 
+                   step="{{ '1' if col_type == 'Integer' else 'any' }}" 
+                   id="{{ col.name }}" 
+                   name="{{ col.name }}" 
+                   value="{{ val }}" 
+                   required>
+          </div>
+
+        {% else %}
+          <!-- DYNAMIC TEXT INPUTS -->
+          <div class="field">
+            <label for="{{ col.name }}">{{ label_name }}</label>
+            <input type="text" id="{{ col.name }}" name="{{ col.name }}" value="{{ val }}" required>
+          </div>
+
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">{{ 'Save changes' if record else 'Add ' ~ entity[:-1] }}</button>
+      <a href="{{ url_for('list_records', entity=entity) }}" class="btn btn-ghost">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

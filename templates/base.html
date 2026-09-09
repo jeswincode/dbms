@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}F1 Fleet Control{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=1.2">
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="{{ url_for('index') }}" class="brand">
+      <span class="stripe"></span> F1 FLEET CONTROL
+    </a>
+    <div class="nav-links">
+      {% if current_user.is_authenticated %}
+        {% set nav_items = [
+          ('teams', 'Teams'), 
+          ('drivers', 'Drivers'), 
+          ('cars', 'Cars'), 
+          ('races', 'Races'), 
+          ('results', 'Results')
+        ] %}
+        
+        {% for entity_id, entity_label in nav_items %}
+          <a href="{{ url_for('list_records', entity=entity_id) }}" 
+             class="{{ 'active' if request.view_args and request.view_args.get('entity') == entity_id else '' }}">
+             {{ entity_label }}
+          </a>
+        {% endfor %}
+
+        <a href="{{ url_for('dynamic_join_view') }}" 
+           class="{{ 'active' if request.endpoint == 'dynamic_join_view' else '' }}">
+           Joins
+        </a>
+
+        {% if current_user.role == 'Admin' %}
+          <a href="{{ url_for('manage_users') }}" 
+             class="{{ 'active' if request.endpoint == 'manage_users' else '' }}"
+             style="color: var(--amber);">
+             Manage Users
+          </a>
+        {% endif %}
+
+        <a href="{{ url_for('logout') }}" style="color: var(--red-bright);">
+          Logout ({{ current_user.username }})
+        </a>
+      {% else %}
+        <a href="{{ url_for('login') }}" class="{{ 'active' if request.endpoint == 'login' else '' }}">
+          Login
+        </a>
+      {% endif %}
+    </div>
+  </nav>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-wrap">
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+
+  <footer>F1 Fleet Control — DBMS project · SQLite via Flask-SQLAlchemy</footer>
+</body>
+</html>

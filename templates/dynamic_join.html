@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Data Joins - F1 DBMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container my-5">
+        <!-- Top Navigation -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Dynamic Database Joins</h2>
+                <p class="text-muted mb-0">Select a base table and join related models on the fly.</p>
+            </div>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                &larr; Dashboard
+            </a>
+        </div>
+
+        <!-- Dynamic Selection Controls -->
+        <div class="card mb-4 shadow-sm border-0">
+            <div class="card-body p-4">
+                <form method="GET" action="{{ url_for('dynamic_join_view', primary_entity=primary_entity) }}">
+                    <div class="row g-3 align-items-end">
+                        
+                        <!-- 1. Primary Entity Selector -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">1. Select Primary Table</label>
+                            <select class="form-select" onchange="window.location.href='/joins/' + this.value">
+                                {% for entity in entities %}
+                                    <option value="{{ entity }}" {% if entity == primary_entity %}selected{% endif %}>
+                                        {{ entity|capitalize }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- 2. Relationship Checkboxes -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">2. Select Tables to Join</label>
+                            <div class="pt-1">
+                                {% if relationships %}
+                                    {% for rel_key, rel_info in relationships.items() %}
+                                        <div class="form-check form-check-inline me-3">
+                                            <input class="form-check-input" 
+                                                   type="checkbox" 
+                                                   name="joins" 
+                                                   value="{{ rel_key }}" 
+                                                   id="chk_{{ rel_key }}"
+                                                   {% if rel_key in selected_join_keys %}checked{% endif %}>
+                                            <label class="form-check-label" for="chk_{{ rel_key }}">
+                                                <span class="badge bg-secondary me-1">{{ rel_info.target_key|capitalize }}</span>
+                                                <small class="text-muted">({{ rel_key }})</small>
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="text-muted small">No foreign key relationships configured on this model.</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="col-md-2 text-end">
+                            <button type="submit" class="btn btn-primary w-100 fw-semibold">
+                                Execute Join
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Joined Results Table -->
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h5 class="card-title mb-0 fw-bold">
+                    Results: {{ primary_entity|capitalize }} 
+                    {% if selected_join_keys %}
+                        <span class="text-primary">+ {{ selected_join_keys|join(', ') }}</span>
+                    {% endif %}
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover table-bordered mb-0 align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                {% for header in headers %}
+                                    <th scope="col" class="text-nowrap">{{ header }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if rows %}
+                                {% for row in rows %}
+                                    <tr>
+                                        {% for val in row %}
+                                            <td>
+                                                {% if val is none %}
+                                                    <span class="badge bg-light text-muted border">NULL</span>
+                                                {% else %}
+                                                    {{ val }}
+                                                {% endif %}
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="{{ headers|length }}" class="text-center py-4 text-muted">
+                                        No records found for this query combination.
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Manage Users — F1 Fleet Control{% endblock %}
+
+{% block content %}
+<div class="page">
+  <div class="section-head">
+    <h2>User & Role Management</h2>
+  </div>
+
+  <!-- Create User Form -->
+  <div class="form-card" style="max-width: 100%; margin-bottom: 2rem;">
+    <h3>Create New User</h3>
+    <form method="POST" action="{{ url_for('manage_users') }}" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap; margin-top: 1rem;">
+      <div class="field" style="flex: 1; min-width: 200px; margin: 0;">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required autocomplete="off">
+      </div>
+      <div class="field" style="flex: 1; min-width: 200px; margin: 0;">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+      <div class="field" style="flex: 1; min-width: 150px; margin: 0;">
+        <label for="role">Role</label>
+        <select id="role" name="role">
+          <option value="Viewer">Viewer (Read-Only)</option>
+          <option value="Editor">Editor (Add/Edit Data)</option>
+          <option value="Admin">Admin (Full Control)</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary" style="height: 42px;">Create User</button>
+    </form>
+  </div>
+
+  <!-- Existing Users Table -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Username</th>
+          <th>Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+          <tr>
+            <td class="mono">{{ u.id }}</td>
+            <td><strong>{{ u.username }}</strong></td>
+            <td><span class="badge badge-on">{{ u.role }}</span></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

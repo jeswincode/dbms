@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — F1 Fleet Control{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-eyebrow">Season database</div>
+  <h1>Run the paddock<br>from one screen.</h1>
+  <p class="lead">
+    Teams, drivers, cars, races and results — one database, five entities,
+    fully editable. Built with Flask and SQLAlchemy for a DBMS coursework project.
+  </p>
+  <div class="checker-strip"></div>
+</section>
+
+<div class="page">
+  <div class="stat-grid" style="padding-top: 0;">
+    <div class="stat-card">
+      <a href="{{ url_for('list_records', entity='teams') }}">
+        <div class="num">{{ stats['Teams'] }}</div>
+        <div class="label">Teams</div>
+      </a>
+    </div>
+    <div class="stat-card">
+      <a href="{{ url_for('list_records', entity='drivers') }}">
+        <div class="num">{{ stats['Drivers'] }}</div>
+        <div class="label">Drivers</div>
+      </a>
+    </div>
+    <div class="stat-card">
+      <a href="{{ url_for('list_records', entity='cars') }}">
+        <div class="num">{{ stats['Cars'] }}</div>
+        <div class="label">Cars</div>
+      </a>
+    </div>
+    <div class="stat-card">
+      <a href="{{ url_for('list_records', entity='races') }}">
+        <div class="num">{{ stats['Races'] }}</div>
+        <div class="label">Races</div>
+      </a>
+    </div>
+    <div class="stat-card">
+      <a href="{{ url_for('list_records', entity='results') }}">
+        <div class="num">{{ stats['Results'] }}</div>
+        <div class="label">Results logged</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Dynamic Joins UI Card -->
+  <div style="background: #15181D; border: 1px solid #262B33; border-left: 4px solid #F5B700; border-radius: 6px; padding: 1.5rem; margin-top: 1rem; display: flex; align-items: center; justify-content: space-between;">
+    <div>
+      <div style="color: #F5B700; font-weight: 700; font-size: 0.8rem; text-transform: uppercase;">Advanced DBMS View</div>
+      <h3 style="margin: 0.2rem 0; font-size: 1.4rem; color: #ECEEF1;">Dynamic Relational Joins</h3>
+      <p style="margin: 0; color: #8B93A1; font-size: 0.9rem;">Cross-reference tables on the fly without writing manual SQL queries.</p>
+    </div>
+    <a href="{{ url_for('dynamic_join_view') }}" class="btn btn-primary" style="background: #C81E3A; color: #FFF; padding: 0.75rem 1.25rem; border-radius: 6px; text-decoration: none; font-weight: 700;">
+      Launch Join Builder &rarr;
+    </a>
+  </div>
+</div>
+{% endblock %}
