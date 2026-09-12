@@ -1,97 +1,90 @@
 # F1 Fleet Control — DBMS Project
 
-A full-stack F1 management website: Flask backend, SQLAlchemy ORM, SQLite
-database, and a racing-themed front end. Five entities, full CRUD
-(Create, Read, Update, Delete) on every one of them.
+A full-stack F1 management website built with Flask, SQLAlchemy, SQLite, Flask-Login and Flask-Migrate.
 
-## Entities & schema
+## Entities & relationships
 
-Each entity deliberately includes all 5 basic data types (Integer, String,
-Float, Date, Boolean), plus foreign keys linking related entities:
+The database currently contains six entities:
 
-| Entity      | Integer         | String           | Float               | Date            | Boolean         |
-|-------------|------------------|-------------------|-----------------------|------------------|-------------------|
-| Team        | id               | name              | budget_million        | founded_date     | is_active         |
-| Driver      | id, team_id (FK) | name              | career_points         | date_of_birth    | is_active         |
-| Car         | id, team_id (FK) | chassis_name      | top_speed_kmh         | build_date       | is_race_ready     |
-| Race        | id               | grand_prix_name   | circuit_length_km     | race_date        | is_completed      |
-| RaceResult  | id, finishing_position, driver_id (FK), race_id (FK) | — | points_scored | recorded_on | fastest_lap |
+- **User** — authentication and Admin / Editor / Viewer roles
+- **Team** — constructor information
+- **Driver** — driver information and team relationship
+- **Car** — car/chassis information and team relationship
+- **Race** — Grand Prix information
+- **RaceResult** — junction entity connecting drivers to races and storing finishing results
 
-Relationships: `Team → Driver` (1‑to‑many), `Team → Car` (1‑to‑many),
-`Driver → RaceResult` (1‑to‑many), `Race → RaceResult` (1‑to‑many).
+Relationships:
+
+```text
+Team 1 ─── * Driver
+Team 1 ─── * Car
+Driver 1 ─── * RaceResult
+Race 1 ─── * RaceResult
+```
+
+`RaceResult` is the source of truth for driver participation. A driver's number of races should therefore be calculated from the distinct `race_id` values in `race_results`, rather than storing a duplicated race count on `Driver`.
+
+## Dashboard aggregates
+
+The dashboard currently shows counts for teams, drivers, cars, races and results. The project is also structured for aggregate statistics such as **average races per driver**.
+
+The correct SQL concept for that statistic is:
+
+```sql
+SELECT AVG(race_count)
+FROM (
+    SELECT driver_id, COUNT(DISTINCT race_id) AS race_count
+    FROM race_results
+    GROUP BY driver_id
+);
+```
+
+If drivers with zero races should also count toward the average, use a `LEFT JOIN` from `drivers` to `race_results` before averaging.
 
 ## Project structure
 
-```
-f1_management/
-├── app.py              # Flask routes (all CRUD logic lives here)
-├── models.py            # SQLAlchemy models / schema definitions
-├── seed_data.py          # Optional: populates sample rows
-├── requirements.txt
-├── static/
-│   ├── css/style.css     # Racing-themed styling
-│   └── js/script.js
-└── templates/
-    ├── base.html         # Shared layout, navbar, flash messages
-    ├── index.html         # Dashboard
-    ├── teams.html / team_form.html
-    ├── drivers.html / driver_form.html
-    ├── cars.html / car_form.html
-    ├── races.html / race_form.html
-    └── results.html / result_form.html
+```text
+app.py                 # Flask routes, CRUD, authentication and joins
+models.py              # SQLAlchemy database models
+requirements.txt       # Python dependencies
+migrations/            # Alembic / Flask-Migrate migrations
+static/css/style.css   # Application styling
+templates/             # Dashboard, authentication, CRUD and join views
 ```
 
 ## Setup
 
-You already have Flask and Flask-SQLAlchemy installed from earlier, but
-if you're setting this up somewhere new:
+Create/activate a virtual environment if desired, then install dependencies:
 
 ```bash
 py -m pip install -r requirements.txt
 ```
 
-## Run it
+Run the application:
 
 ```bash
 py app.py
 ```
 
-Then open **http://127.0.0.1:5000** in your browser. The database file
-(`f1_management.db`) is created automatically on first run — no manual
-setup required.
+Then open `http://127.0.0.1:5000`.
 
-### Optional: add sample data
+The SQLite database is created locally under `instance/` when the application initializes it. The database file, `.env`, Python bytecode and other generated files are intentionally ignored by Git.
 
-To pre-fill the site with a couple of teams, drivers, cars, races and
-results (handy for demoing to your professor):
+## Migrations
+
+Flask-Migrate is configured in `app.py`.
+
+For a schema change, prefer creating a migration instead of committing the local SQLite database:
 
 ```bash
-py seed_data.py
+flask db migrate -m "describe the schema change"
+flask db upgrade
 ```
 
-It checks whether the database already has data before inserting, so
-it's safe to leave in your project.
-
-## How it fits together (for making changes)
-
-- **Add a field to an entity** → edit the model in `models.py`, delete
-  `f1_management.db` (or write a migration) so it rebuilds with the new
-  column, then add the corresponding `<input>` to that entity's form
-  template and read it in the matching route in `app.py`.
-- **Add a 6th entity** → copy the pattern used for any existing entity:
-  one model class in `models.py`, one list route + two form routes
-  (`add`/`edit`) + one delete route in `app.py`, one list template and
-  one shared add/edit form template, and a nav link in `base.html`.
-- **Styling** → all design tokens (colors, fonts) are defined once at
-  the top of `static/css/style.css` under `:root`, so re-theming means
-  changing a handful of hex values in one place.
+Review generated migrations before applying them, especially for SQLite batch operations.
 
 ## Notes
 
-- Uses SQLite by default (zero setup). To switch to MySQL/PostgreSQL for
-  a more "real" DBMS demo, just change `SQLALCHEMY_DATABASE_URI` in
-  `app.py` (e.g. `mysql+pymysql://user:pass@localhost/f1db`) and install
-  the matching driver.
-- `debug=True` in `app.py` is convenient for development (auto-reloads
-  on file changes, shows detailed errors) — turn it off before deploying
-  anywhere public.
+- Keep secrets and local configuration in `.env`; do not commit them.
+- Keep `instance/*.db` local. The repository should contain the schema/models and migrations, not a developer's live database.
+- `debug=True` is useful during development but should be disabled before public deployment.
